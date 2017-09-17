@@ -1,12 +1,17 @@
 'use strict';
 const userController = require('../controllers/userContrller');
 const router = require('router');
-const mysql = require('mysql');
-const pool = mysql.createPool({
-				connectionLimit	: 100,
-				host						: 'localhost',
-				user						: 'root',
-				password				: '',
-				database				: 'blogging'
-			});
 
+
+router.route('/')
+	.get(userContrller.ListUsers)
+	.post(userContrller.CreateUser);
+	
+
+router.route('/:userId')
+	.get(userContrller.SingleUser)
+	.put(userContrller.UpdateUser)
+	.delete(userContrller.DeleteUser);
+
+
+module.exports = router;
