@@ -10,7 +10,12 @@ app.use(parser.json());
 app.use(parser.urlencoded({extended: true}));
 
 
+app.use('/',(err,req,res, next)=>{
+	if(err) throw err;
+	next();
+})
 
+app.use('/user',userRoute);
 
 
 /**
@@ -19,10 +24,14 @@ app.use(parser.urlencoded({extended: true}));
 app.use((req,res, next)=>{
 	
 	console.log("not found");
-	res.sendFile(__dirname+'/public/Error.html');
+	// res.sendFile(__dirname+'/public/Error.html');
 });
 
 
-app.listen(port, ()=>{
-	console.log(`${port} listening`);
-}));
+app.listen(port, (err)=>{
+	if(err) {
+		console.log("Error: ",err);
+	}else{
+		console.log(`${port} listening`);
+	}
+});

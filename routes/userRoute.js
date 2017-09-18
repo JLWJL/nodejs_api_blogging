@@ -1,17 +1,18 @@
 'use strict';
-const userController = require('../controllers/userContrller');
-const router = require('router');
+const express = require('express');
+const userController = require('../controllers/userController');
+const router = express.Router();
 
 
 router.route('/')
-	.get(userContrller.ListUsers)
-	.post(userContrller.CreateUser);
+	.get(userController.ListUsers)
+// 	.post(userController.CreateUser);
 	
 
 router.route('/:userId')
-	.get(userContrller.SingleUser)
-	.put(userContrller.UpdateUser)
-	.delete(userContrller.DeleteUser);
+	.get(userController.SingleUser)
+// 	.put(userController.UpdateUser)
+// 	.delete(userController.DeleteUser);
 
 
 module.exports = router;
