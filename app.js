@@ -23,7 +23,7 @@ app.use('/user',userRoute);
 */
 app.use((req,res, next)=>{
 	
-	console.log("not found");
+	res.send("not found");
 	// res.sendFile(__dirname+'/public/Error.html');
 });
 

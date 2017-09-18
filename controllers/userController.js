@@ -42,12 +42,38 @@ function singleUser(req,res){
 
 
 function createUser(req,res){
-	
+	let userName = req.query.user_name;
+	let sql = "INSERT INTO user (`user_name`) VALUES (?)";
+	pool.query(sql,[userName],(err,results,fields)=>{
+		if(err){
+		 res.status(400).send(err);
+		}
+		else{
+			res.status(200).send("User created")
+		}
+	});
 }
 
 
 function updateUser(req,res){
-	
+	if(!isEmptyObj(req.query)){
+		let id  = req.params.userId;
+		
+		let sql = "UPDATE user SET ? WHERE user_id = ?";
+		console.log("Request.query: ", req.query);
+		console.log("ID: ", id);
+		pool.query(sql,[req.query, id],(err,results,fields)=>{
+			if(err){
+				res.status(400).send(err);
+			}else{
+				res.status(200).send("User updated");
+			}
+
+		});
+	}
+	else{
+		res.json({note:"Nothing has been updated"});
+	}
 }
 
 
@@ -56,10 +82,25 @@ function deleteUser(req,res){
 }
 
 
+function buildUpdateQuery(params){
+	if(params==null){
+		return
+	}
+}
+
+
+function isEmptyObj(obj){
+    return (Object.getOwnPropertyNames(obj).length === 0);
+}
+
+
+
 
 
 module.exports = {
 	ListUsers: listUsers,
-	SingleUser: singleUser
+	SingleUser: singleUser,
+	CreateUser:createUser,
+	UpdateUser:updateUser
 
 };
