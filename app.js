@@ -16,6 +16,7 @@ app.use('/',(err,req,res, next)=>{
 })
 
 app.use('/user',userRoute);
+app.use('/post',postRoute);
 
 
 /**

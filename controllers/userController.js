@@ -29,7 +29,7 @@ function singleUser(req,res){
 	console.log("SQL: ",sql);
 	pool.query(sql,(err,results,fields)=>{
 		if(err){
-			res.status(400).send("Error - single user: "+err);
+			res.status(500).send("Error - single user: "+err);
 		}
 		else if(results.length==0){
 			res.send("User doesn't exist");
@@ -46,7 +46,7 @@ function createUser(req,res){
 	let sql = "INSERT INTO user (`user_name`) VALUES (?)";
 	pool.query(sql,[userName],(err,results,fields)=>{
 		if(err){
-		 res.status(400).send(err);
+		 res.status(500).send(err);
 		}
 		else{
 			res.status(200).send("User created")
@@ -58,13 +58,12 @@ function createUser(req,res){
 function updateUser(req,res){
 	if(!isEmptyObj(req.query)){
 		let id  = req.params.userId;
-		
 		let sql = "UPDATE user SET ? WHERE user_id = ?";
 		console.log("Request.query: ", req.query);
 		console.log("ID: ", id);
 		pool.query(sql,[req.query, id],(err,results,fields)=>{
 			if(err){
-				res.status(400).send(err);
+				res.status(500).send(err);
 			}else{
 				res.status(200).send("User updated");
 			}
@@ -72,20 +71,25 @@ function updateUser(req,res){
 		});
 	}
 	else{
-		res.json({note:"Nothing has been updated"});
+		res.json({result:"Nothing has been updated"});
 	}
 }
 
 
 function deleteUser(req,res){
-	
-}
+	let id = req.params.userId;
+	let sql = "DELETE FROM user WHERE user_id =?";
 
+	pool.query(sql, [id], (err,results,fields)=>{
+		if(err){
+			res.status(500).send("Error when deleting: "+err);
+		}
+		else{
+			results.message = "Delete done";
+			res.status(200).json(results)
+		}
+	});
 
-function buildUpdateQuery(params){
-	if(params==null){
-		return
-	}
 }
 
 
@@ -98,9 +102,10 @@ function isEmptyObj(obj){
 
 
 module.exports = {
-	ListUsers: listUsers,
+	ListUsers : listUsers,
 	SingleUser: singleUser,
-	CreateUser:createUser,
-	UpdateUser:updateUser
+	CreateUser: createUser,
+	UpdateUser: updateUser,
+	DeleteUser: deleteUser
 
 };

@@ -1,16 +1,18 @@
 'use strict';
-const postController = require('../controllers/postContrller');
-const router = require('router');
+const express = require('express');
+const postController = require('../controllers/postController');
+const router = express.Router();
 
 
 router.route('/')
-	.get(postContrller.ListPosts);
+	.get(postController.ListPosts)
+	.post(postController.CreatePost);
 	
 
-router.route('/:userId')
-	.get(postContrller.SinglePost)
-	.put(postContrller.UpdatePost)
-	.delete(postContrller.DeletePost);
+router.route('/:postId')
+	.get(postController.SinglePost)
+	.put(postController.UpdatePost)
+	.delete(postController.DeletePost);
 
 
 
