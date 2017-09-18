@@ -22,9 +22,7 @@ app.use('/user',userRoute);
 * Error handling
 */
 app.use((req,res, next)=>{
-	
 	res.send("not found");
-	// res.sendFile(__dirname+'/public/Error.html');
 });
 
 

@@ -12,7 +12,7 @@ router.route('/')
 router.route('/:userId')
 	.get(userController.SingleUser)
 	.put(userController.UpdateUser)
-// 	.delete(userController.DeleteUser);
+ 	.delete(userController.DeleteUser);
 
 
 module.exports = router;
