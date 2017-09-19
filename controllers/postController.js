@@ -90,16 +90,20 @@ function updatePost(req,res){
 
 
 function deletePost(req,res){
-		let id = req.params.userId;
-	let sql = "DELETE FROM user WHERE user_id =?";
+		let id = req.params.postId;
+	let sql = "DELETE FROM post WHERE post_id =?";
 
 	pool.query(sql, [id], (err,results,fields)=>{
 		if(err){
-			res.status(500).send("Error when deleting: "+err);
+			res.status(500).send("Error when deleting post: "+err);
 		}
-		else{
-			results.message = "Delete done";
+		else if(results.affectedRows <1){
+			results.message = "No post found for deleting";
+			res.status(400).json(results);
+		}else{
+			results.message = "Deleting post done";
 			res.status(200).json(results)
+			
 		}
 	});
 }
