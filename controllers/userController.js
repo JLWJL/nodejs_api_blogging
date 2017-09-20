@@ -42,7 +42,7 @@ function singleUser(req,res){
 
 
 function createUser(req,res){
-	let userName = req.query.user_name;
+	let userName = req.body.user_name;
 	let sql = "INSERT INTO user (`user_name`) VALUES (?)";
 	pool.query(sql,[userName],(err,results,fields)=>{
 		if(err){
@@ -56,12 +56,12 @@ function createUser(req,res){
 
 
 function updateUser(req,res){
-	if(!isEmptyObj(req.query)){
+	if(!isEmptyObj(req.body)){
 		let id  = req.params.userId;
 		let sql = "UPDATE user SET ? WHERE user_id = ?";
-		console.log("Request.query: ", req.query);
+		console.log("Request.query: ", req.body);
 		console.log("ID: ", id);
-		pool.query(sql,[req.query, id],(err,results,fields)=>{
+		pool.query(sql,[req.body, id],(err,results,fields)=>{
 			if(err){
 				res.status(500).send(err);
 			}else{

@@ -47,8 +47,8 @@ function singlePost(req,res){
 * Check if user exists before insert new post
 */
 function createPost(req,res){
-	let postName = req.query.post_name;
-	let userId = req.query.user_id;
+	let postName = req.body.post_name;
+	let userId = req.body.user_id;
 
 	if(!postName || !userId)
 	{
@@ -69,17 +69,15 @@ function createPost(req,res){
 
 
 function updatePost(req,res){
-	if(!isEmptyObj(req.query)){
-		let id  = req.params.userId;
+	if(!isEmptyObj(req.body)){
+		let id  = req.params.postId;
+		let sql = "UPDATE post SET ? WHERE post_id = ?";
 		
-		let sql = "UPDATE user SET ? WHERE user_id = ?";
-		console.log("Request.query: ", req.query);
-		console.log("ID: ", id);
-		pool.query(sql,[req.query, id],(err,results,fields)=>{
+		pool.query(sql,[req.body, id],(err,results,fields)=>{
 			if(err){
 				res.status(500).send(err);
 			}else{
-				res.status(200).send("User updated");
+				res.status(200).send("Post updated");
 			}
 		});
 	}
@@ -119,17 +117,15 @@ function isEmptyObj(obj){
 */
 function isUserExist(id, next){
 	pool.query("SELECT * FROM user WHERE user_id =?", [id], (err,results,fields)=>{
-			
 			let isExist = results.length < 1 ? false:true;
-			console.log("What is nt: ",typeof nt);
-
 			next(isExist);
 	});
 }
 
+
 function insertPost(req,res){
 	let sql = "INSERT INTO post SET ?";
-	pool.query(sql,[req.query],(err,results,fields)=>{
+	pool.query(sql,[req.body],(err,results,fields)=>{
 		if(err){
 		 res.status(500).send(err);
 		}
