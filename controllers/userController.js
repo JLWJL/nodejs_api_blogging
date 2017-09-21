@@ -93,19 +93,95 @@ function deleteUser(req,res){
 }
 
 
+function followUser(req,res){
+	let follow = req.params.follow_id;
+	let followed = req.params.followed_id;
+
+	if(follow && followed && (follow !== followed)){
+		let sql = "INSERT INTO following SET ?"
+
+		pool.query(sql, [req.params], (err,results, fields)=>{
+			if(err){
+				res.status(500).send("Error when building user following connection: "+err);				
+			}else{
+				results.message = "Follow done";
+				res.status(200).send(results);
+			}
+
+		});
+
+	}
+	else{
+		res.status(400).send("Need two different user id")
+	}
+}
+
+
+function unFollowUser(req,res){
+	let follow = req.params.follow_id;
+	let followed = req.params.followed_id;
+
+	if(follow && followed && (follow !== followed)){
+		let sql = "DELETE FROM following WHERE follow_id = ? AND followed_id =?";
+
+		pool.query(sql, [follow, followed], (err,results, fields)=>{
+			if(err){
+				res.status(500).send("Error when deleting user following connection: "+err);				
+			}else{
+				results.message = "Unfollow done";
+				res.status(200).send(results);
+			}
+		});
+	}
+	else{
+		res.status(400).send("Need two different user id")
+	}
+}
+
+
+function listAllFollowing(req, res){
+	let sql = "SELECT * FROM following"
+	pool.query(sql, (err,results,fields)=>{
+		if(err){
+			res.status(500).send("Error when listing all user following connections: "+err);				
+		}else{
+			results.message = "List all user following connections done";
+			res.status(200).json(results);
+		}
+	});
+}
+
+
+function listUserFollowing(req, res){
+	let follow_id = req.params.userId;
+	let sql = "SELECT * FROM following WHERE follow_id = ?"
+	pool.query(sql, [follow_id], (err,results,fields)=>{
+		if(err){
+			res.status(500).send("Error when listing the user following list: "+err);				
+		}else{
+			results.message = "List user's following list done";
+			res.status(200).json(results);
+		}
+	});
+}
+
+
+
 function isEmptyObj(obj){
     return (Object.getOwnPropertyNames(obj).length === 0);
 }
 
 
 
-
-
 module.exports = {
-	ListUsers : listUsers,
-	SingleUser: singleUser,
-	CreateUser: createUser,
-	UpdateUser: updateUser,
-	DeleteUser: deleteUser
+	ListUsers   : listUsers,
+	SingleUser  : singleUser,
+	CreateUser  : createUser,
+	UpdateUser  : updateUser,
+	DeleteUser  : deleteUser,
+	FollowUser  : followUser,
+	UnFollowUser: unFollowUser,
+	ListAllFollowing: listAllFollowing,
+	ListUserFollowing: listUserFollowing
 
 };
