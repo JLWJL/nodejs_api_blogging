@@ -23,5 +23,7 @@ router.route('/:userId')
 router.route('/:userId/following')
 	.get(userController.ListUserFollowing)
 
+router.route('/:userId/following/post')
+	.get(userController.FollowerPost)
 
 module.exports = router;

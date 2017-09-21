@@ -167,6 +167,22 @@ function listUserFollowing(req, res){
 
 
 
+function followerPost(req,res){
+	let user_id = req.params.userId;
+	let sql = "SELECT post_id, post_name FROM post INNER JOIN following on (post.user_id = following.followed_id) WHERE following.follow_id = ?";
+
+
+	pool.query(sql, [user_id], (err,results,fields)=>{
+		if(err){
+			res.status(500).send("Error when listing all posts of user's following: "+err);				
+		}else{
+			results.message = "listing all posts of user's following done";
+			res.status(200).json(results);
+		}
+	});
+}
+
+
 function isEmptyObj(obj){
     return (Object.getOwnPropertyNames(obj).length === 0);
 }
@@ -182,6 +198,7 @@ module.exports = {
 	FollowUser  : followUser,
 	UnFollowUser: unFollowUser,
 	ListAllFollowing: listAllFollowing,
-	ListUserFollowing: listUserFollowing
+	ListUserFollowing: listUserFollowing,
+	FollowerPost: followerPost
 
 };
