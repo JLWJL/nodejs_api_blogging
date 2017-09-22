@@ -26,4 +26,8 @@ router.route('/:userId/following')
 router.route('/:userId/following/post')
 	.get(userController.FollowerPost)
 
+router.route('/:userId/post/favourite/')
+	.get(userController.ListLikedPost)
+	.post(userController.LikePost)
+
 module.exports = router;

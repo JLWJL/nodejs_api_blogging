@@ -183,6 +183,57 @@ function followerPost(req,res){
 }
 
 
+/*
+* GET:
+* List all liked posts of an user
+*/
+function listLikedPost(req, res){
+	let user_id = req.params.userId;
+	let sql = `SELECT post_liked.post_id, post_name 
+						FROM post_liked, post 
+						WHERE post_liked.post_id = post.post_id
+						AND post_liked.user_id = ?`;
+
+	pool.query(sql, [user_id], (err,results,fields)=>{
+			if(err){
+				res.status(500).send("Error when listing user's liked post: "+err);				
+			}else{
+				results.message = "Listing user's liked post done";
+				res.status(200).json(results);
+			}
+		}
+	);
+
+}
+
+
+
+/*
+* POST:
+* User like a post
+*/
+function likePost(req,res){
+	let user_id = req.params.userId;
+	let post_id = req.body.postId;
+	let sql = "INSERT INTO post_liked (`post_id`, `user_id`) VALUES(?,?)";
+
+	if(user_id && post_id){
+		pool.query(sql,[post_id, user_id], (err,results, fields)=>{
+			if(err){
+				res.status(500).send("Error when adding user's liked post: "+err);				
+			}else{
+				results.message = "Adding user's liked post done";
+				res.status(200).json(results);
+			}
+		});
+	}
+	else{
+		res.status(400).send("Need user id and post id");
+	}
+}
+
+
+
 function isEmptyObj(obj){
     return (Object.getOwnPropertyNames(obj).length === 0);
 }
@@ -199,6 +250,8 @@ module.exports = {
 	UnFollowUser: unFollowUser,
 	ListAllFollowing: listAllFollowing,
 	ListUserFollowing: listUserFollowing,
-	FollowerPost: followerPost
+	FollowerPost: followerPost,
+	LikePost: likePost,
+	ListLikedPost:listLikedPost
 
 };
