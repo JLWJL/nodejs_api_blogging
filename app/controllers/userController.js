@@ -1,11 +1,11 @@
-// const mysql = require('mysql');
-// const pool = mysql.createPool({
-// 				connectionLimit	: 100,
-// 				host						: 'localhost',
-// 				user						: 'root',
-// 				password				: '',
-// 				database				: 'blogging'
-// 			});
+const mysql = require('mysql');
+const pool = mysql.createPool({
+				connectionLimit	: 100,
+				host						: 'localhost',
+				user						: 'root',
+				password				: '',
+				database				: 'blogging'
+			});
 
 const User = require ('../models/userModel');
 
@@ -13,24 +13,18 @@ const User = require ('../models/userModel');
 
 
 function listUsers(req,res){
-	User.getAll((results)=>{
+	User.getAll(null, (results)=>{
 		res.json(results);
 	});
 }
 
 
 function singleUser(req,res){
-	let id = pool.escape(req.params.userId);
-	let sql = "SELECT * FROM user WHERE user_id ="+id;
-	console.log("SQL: ",sql);
-	pool.query(sql,(err,results,fields)=>{
-		if(err){
-			res.status(500).send("Error - single user: "+err);
-		}
-		else if(results.length==0){
-			res.send("User doesn't exist");
+	let id = req.params.userId;
+	User.singleUser(id, (results)=>{
+		if(results.length==0){
+			res.send("User not found");
 		}else{
-			console.log("Result: ", results);
 			res.json(results);
 		}
 	});
@@ -38,33 +32,26 @@ function singleUser(req,res){
 
 
 function createUser(req,res){
-	let userName = req.body.user_name;
-	let sql = "INSERT INTO user (`user_name`) VALUES (?)";
-	pool.query(sql,[userName],(err,results,fields)=>{
-		if(err){
-		 res.status(500).send(err);
-		}
-		else{
-			res.status(200).send("User created")
-		}
+	
+	User.createUser(req.body, function(result){
+		res.json (result);
 	});
 }
 
 
 function updateUser(req,res){
-	if(!isEmptyObj(req.body)){
-		let id  = req.params.userId;
-		let sql = "UPDATE user SET ? WHERE user_id = ?";
-		console.log("Request.query: ", req.body);
-		console.log("ID: ", id);
-		pool.query(sql,[req.body, id],(err,results,fields)=>{
-			if(err){
-				res.status(500).send(err);
-			}else{
-				res.status(200).send("User updated");
-			}
 
+	if(!isEmptyObj(req.body)){
+		
+		let values = [
+			req.body,
+			req.params.userId
+		]
+		
+		User.updateUser(values, (result)=>{
+			res.json(result);
 		});
+		
 	}
 	else{
 		res.json({result:"Nothing has been updated"});
