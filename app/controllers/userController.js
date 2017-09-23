@@ -51,7 +51,7 @@ function updateUser(req,res){
 		User.updateUser(values, (result)=>{
 			res.json(result);
 		});
-		
+
 	}
 	else{
 		res.json({result:"Nothing has been updated"});
@@ -61,18 +61,10 @@ function updateUser(req,res){
 
 function deleteUser(req,res){
 	let id = req.params.userId;
-	let sql = "DELETE FROM user WHERE user_id =?";
-
-	pool.query(sql, [id], (err,results,fields)=>{
-		if(err){
-			res.status(500).send("Error when deleting: "+err);
-		}
-		else{
-			results.message = "Delete done";
-			res.status(200).json(results)
-		}
+	
+	User.deleteUser(id, (result)=>{
+		res.json(result);
 	});
-
 }
 
 
@@ -81,16 +73,9 @@ function followUser(req,res){
 	let followed = req.params.followed_id;
 
 	if(follow && followed && (follow !== followed)){
-		let sql = "INSERT INTO following SET ?"
 
-		pool.query(sql, [req.params], (err,results, fields)=>{
-			if(err){
-				res.status(500).send("Error when building user following connection: "+err);				
-			}else{
-				results.message = "Follow done";
-				res.status(200).send(results);
-			}
-
+		User.followUser([req.params], (result)=>{
+			res.status(200).send(result);
 		});
 
 	}
@@ -105,15 +90,9 @@ function unFollowUser(req,res){
 	let followed = req.params.followed_id;
 
 	if(follow && followed && (follow !== followed)){
-		let sql = "DELETE FROM following WHERE follow_id = ? AND followed_id =?";
 
-		pool.query(sql, [follow, followed], (err,results, fields)=>{
-			if(err){
-				res.status(500).send("Error when deleting user following connection: "+err);				
-			}else{
-				results.message = "Unfollow done";
-				res.status(200).send(results);
-			}
+		User.unFollowUser([follow,followed],(result)=>{
+			res.status(200).send(result);
 		});
 	}
 	else{
@@ -123,45 +102,28 @@ function unFollowUser(req,res){
 
 
 function listAllFollowing(req, res){
-	let sql = "SELECT * FROM following"
-	pool.query(sql, (err,results,fields)=>{
-		if(err){
-			res.status(500).send("Error when listing all user following connections: "+err);				
-		}else{
-			results.message = "List all user following connections done";
-			res.status(200).json(results);
-		}
+
+	User.listAllFollowing((results)=>{
+		res.json(results);
 	});
+
 }
 
 
 function listUserFollowing(req, res){
 	let follow_id = req.params.userId;
-	let sql = "SELECT * FROM following WHERE follow_id = ?"
-	pool.query(sql, [follow_id], (err,results,fields)=>{
-		if(err){
-			res.status(500).send("Error when listing the user following list: "+err);				
-		}else{
-			results.message = "List user's following list done";
-			res.status(200).json(results);
-		}
+
+	User.listUserFollowing(follow_id, (results)=>{
+		res.json(results);
 	});
+
 }
-
-
 
 function followerPost(req,res){
 	let user_id = req.params.userId;
-	let sql = "SELECT post_id, post_name FROM post INNER JOIN following on (post.user_id = following.followed_id) WHERE following.follow_id = ?";
 
-
-	pool.query(sql, [user_id], (err,results,fields)=>{
-		if(err){
-			res.status(500).send("Error when listing all posts of user's following: "+err);				
-		}else{
-			results.message = "listing all posts of user's following done";
-			res.status(200).json(results);
-		}
+	User.followerPost(user_id, (results)=>{
+		res.json(results);
 	});
 }
 
@@ -177,15 +139,9 @@ function listLikedPost(req, res){
 						WHERE post_liked.post_id = post.post_id
 						AND post_liked.user_id = ?`;
 
-	pool.query(sql, [user_id], (err,results,fields)=>{
-			if(err){
-				res.status(500).send("Error when listing user's liked post: "+err);				
-			}else{
-				results.message = "Listing user's liked post done";
-				res.status(200).json(results);
-			}
-		}
-	);
+	User.listLikedPost(user_id, (results)=>{
+		res.json(results);
+	});
 
 }
 
@@ -198,16 +154,10 @@ function listLikedPost(req, res){
 function likePost(req,res){
 	let user_id = req.params.userId;
 	let post_id = req.body.postId;
-	let sql = "INSERT INTO post_liked (`post_id`, `user_id`) VALUES(?,?)";
 
 	if(user_id && post_id){
-		pool.query(sql,[post_id, user_id], (err,results, fields)=>{
-			if(err){
-				res.status(500).send("Error when adding user's liked post: "+err);				
-			}else{
-				results.message = "Adding user's liked post done";
-				res.status(200).json(results);
-			}
+		User.likePost([post_id, user_id], (results)=>{
+			res.json(results);
 		});
 	}
 	else{
