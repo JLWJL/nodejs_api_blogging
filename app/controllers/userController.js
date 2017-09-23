@@ -1,24 +1,20 @@
-const mysql = require('mysql');
-const pool = mysql.createPool({
-				connectionLimit	: 100,
-				host						: 'localhost',
-				user						: 'root',
-				password				: '',
-				database				: 'blogging'
-			});
+// const mysql = require('mysql');
+// const pool = mysql.createPool({
+// 				connectionLimit	: 100,
+// 				host						: 'localhost',
+// 				user						: 'root',
+// 				password				: '',
+// 				database				: 'blogging'
+// 			});
+
+const User = require ('../models/userModel');
+
+
+
 
 function listUsers(req,res){
-	let sql = "Select * FROM user"
-	pool.query(sql, (err, results, fields)=>{
-		if(err) {
-			console.log("Error: List all users");
-			res.send(err);
-			return;
-		}
-		else if(results!==null){
-			console.log("All users sent");
-			res.json(results);
-		}
+	User.getAll((results)=>{
+		res.json(results);
 	});
 }
 
