@@ -14,7 +14,7 @@ const app = express();
 * Error handling
 */
 app.use((req,res, next)=>{
-	res.send("not found");
+	res.status(404).send("not found");
 });
 
 db.connect(function(err){
@@ -28,7 +28,7 @@ db.connect(function(err){
 	}
 });
 
-
+module.exports = app;
 
 // app.use(parser.json());
 // app.use(parser.urlencoded({extended: true}));
