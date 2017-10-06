@@ -26,7 +26,11 @@ function singlePost(req,res){
 function createPost(req,res){
 	
 	Post.CreatePost(req.body, function(result){
-		res.json (result);
+		if(result.Error){
+			res.status(400).send(result);
+		}else{
+			res.status(201).json(result);
+		}
 	});
 }
 
