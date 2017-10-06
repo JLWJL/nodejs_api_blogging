@@ -18,7 +18,7 @@ function singleUser(values, done){
 
 	db.getPool().query(sql, [values], (err, results, fields)=>{
 		if(err) {
-			return done({"Error": "Get signle user error: "+err});
+			return done({"Error": "Get single user error: "+err});
 		}
 		return done(results);
 	});

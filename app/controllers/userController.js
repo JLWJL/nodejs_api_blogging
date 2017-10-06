@@ -1,12 +1,3 @@
-const mysql = require('mysql');
-const pool = mysql.createPool({
-				connectionLimit	: 100,
-				host						: 'localhost',
-				user						: 'root',
-				password				: '',
-				database				: 'blogging'
-			});
-
 const User = require ('../models/userModel');
 
 
@@ -23,7 +14,7 @@ function singleUser(req,res){
 	let id = req.params.userId;
 	User.singleUser(id, (results)=>{
 		if(results.length==0){
-			res.send("User not found");
+			res.send(results);
 		}else{
 			res.json(results);
 		}

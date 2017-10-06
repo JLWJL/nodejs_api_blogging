@@ -1,41 +1,18 @@
-const mysql = require('mysql');
-const pool = mysql.createPool({
-				connectionLimit	: 100,
-				host						: 'localhost',
-				user						: 'root',
-				password				: '',
-				database				: 'blogging'
-			});
-
+const Post = require('../models/postModel');
 
 function listPosts(req,res){
-	let sql = "Select * FROM post"
-	pool.query(sql, (err, results, fields)=>{
-		if(err) {
-			console.log("Error when List all posts");
-			res.send(err);
-			return;
-		}
-		else if(results!==null){
-			console.log("All posts sent");
-			res.json(results);
-		}
+	Post.ListPosts((results)=>{
+		res.json(results);
 	});
 }
 
 
 function singlePost(req,res){
 	let id = pool.escape(req.params.postId);
-	let sql = "SELECT * FROM post WHERE post_id ="+id;
-	
-	pool.query(sql,(err,results,fields)=>{
-		if(err){
-			res.status(500).send("Error when get single post: "+err);
-		}
-		else if(results.length==0){
-			res.send("Post doesn't exist");
+	Post.SinglePost(id, (results)=>{
+		if(results.length==0){
+			res.send(results);
 		}else{
-			console.log("Result: ", results);
 			res.json(results);
 		}
 	});
@@ -47,62 +24,38 @@ function singlePost(req,res){
 * Check if user exists before insert new post
 */
 function createPost(req,res){
-	let postName = req.body.post_name;
-	let userId = req.body.user_id;
-
-	if(!postName || !userId)
-	{
-		res.status(400).send("Post name and user id required");
-
-	}else{
-		
-		isUserExist(userId, function(result){
-			if(result){
-				insertPost(req,res);
-			}
-			else{
-				res.status(400).send("User not found, can't create post");
-			}
-		});
-	}
+	
+	Post.CreatePost(req.body, function(result){
+		res.json (result);
+	});
 }
 
 
 function updatePost(req,res){
+
 	if(!isEmptyObj(req.body)){
-		let id  = req.params.postId;
-		let sql = "UPDATE post SET ? WHERE post_id = ?";
 		
-		pool.query(sql,[req.body, id],(err,results,fields)=>{
-			if(err){
-				res.status(500).send(err);
-			}else{
-				res.status(200).send("Post updated");
-			}
+		let values = [
+			req.body,
+			req.params.post_id
+		]
+		
+		Post.UpdatePost(values, (result)=>{
+			res.json(result);
 		});
+
 	}
 	else{
 		res.json({result:"Nothing has been updated"});
 	}
+
 }
 
 
 function deletePost(req,res){
-		let id = req.params.postId;
-	let sql = "DELETE FROM post WHERE post_id =?";
-
-	pool.query(sql, [id], (err,results,fields)=>{
-		if(err){
-			res.status(500).send("Error when deleting post: "+err);
-		}
-		else if(results.affectedRows <1){
-			results.message = "No post found for deleting";
-			res.status(400).json(results);
-		}else{
-			results.message = "Deleting post done";
-			res.status(200).json(results)
-			
-		}
+	let id = req.params.postId;
+	Post.DeletePost(id, (results)=>{
+		res.json(result);
 	});
 }
 
