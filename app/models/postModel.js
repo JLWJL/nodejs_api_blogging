@@ -4,22 +4,28 @@ function listPosts(done){
 	let sql = "Select * FROM post"
 	db.getPool().query(sql, (err, results, fields)=>{
 		if(err) {
-			return done({"Error": "List all posts error"});
+			return done({
+				"message": err.code,
+				"status" : 500 
+			}, null);
 		}
-		return done(results);
+		return done(null,results);
 	});
 }
 
 
 function singlePost(values, done){
-	let id = db.getPool().escape(req.params.postId);
+	let id = db.getPool().escape(values);
 	let sql = "SELECT * FROM post WHERE post_id ="+id;
 	
 	db.getPool().query(sql,[values],(err,results,fields)=>{
 		if(err){
-			return done({"Error": "Get signle post error: "+err});
+			let error = {"message":err.code,"status":500};
+			return done(error, results);
+		}else{
+			return done(err, results);
 		}
-		return done(results);
+		
 	});
 }
 
@@ -34,16 +40,25 @@ function createPost(values, done){
 
 	if(!postName || !userId)
 	{
-		done({"Error": "Post name and user id required"});
+		return done({
+			"message": "Post name and user id required",
+			"status" : 400
+		}, null);
 
 	}else{
 		
-		isUserExist(userId, function(result){
-			if(result){
+		isUserExist(userId, function(err,result){
+			if(err){
+				done(err,null)
+			}
+			else if(result){
 				insertPost(values, done);
 			}
 			else{
-				done({"Error":"User not found, cannot create post"});
+				done({
+					"message":"User not found, cannot create post",
+					"status": 400
+				},null);
 			}
 		});
 	}
@@ -55,9 +70,12 @@ function updatePost(values, done){
 	
 	db.getPool().query(sql,[values],(err,results,fields)=>{
 		if(err){
-			return done({"Error":"Update post error"+err});
+			return done({
+				"message":err.code,
+				"status":500
+			}, null);
 		}else{
-			done(results);
+			done(err, results);
 		}
 	});
 }
@@ -68,12 +86,13 @@ function deletePost(values, done){
 
 	db.getPool().query(sql, [values], (err,results,fields)=>{
 		if(err){
-			return done({"Error":"Delete post error"+err});
+			return done({
+				"message":err.code,
+				"status":500
+			},null);
 		}
-		else if(results.affectedRows <1){
-			done({"Result":"No post found for deleting"});
-		}else{
-			done(results);			
+		else{
+			done(err,results);			
 		}
 	});
 }
@@ -89,8 +108,15 @@ function isEmptyObj(obj){
 */
 function isUserExist(id, next){
 	db.getPool().query("SELECT * FROM user WHERE user_id =?", [id], (err,results,fields)=>{
+			if(err){
+				next({
+					"message":err.code,
+					"status": 500
+				},
+				 null)	;		
+			}
 			let isExist = results.length < 1 ? false:true;
-			next(isExist);
+			next(null, isExist);
 	});
 }
 
@@ -99,10 +125,13 @@ function insertPost(values, done){
 	let sql = "INSERT INTO post SET ?";
 	db.getPool().query(sql,[values],(err,results,fields)=>{
 		if(err){
-		 done({"Error": "Insert post error"});
+		 done({
+		 	"message": err.code,
+			"status": 500
+		 }, null);
 		}
 		else{
-			done(results)
+			done(null,results)
 		}
 	});
 }

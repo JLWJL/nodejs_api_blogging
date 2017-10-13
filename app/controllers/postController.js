@@ -1,19 +1,24 @@
 const Post = require('../models/postModel');
 
-function listPosts(req,res){
-	Post.ListPosts((results)=>{
-		res.json(results);
+function listPosts(req,res,next){
+	Post.ListPosts((err, results)=>{
+		if(err){
+			next(err)
+		}else{
+			res.json(results);
+		}
 	});
 }
 
 
-function singlePost(req,res){
-	let id = pool.escape(req.params.postId);
-	Post.SinglePost(id, (results)=>{
-		if(results.length==0){
-			res.send(results);
+function singlePost(req,res,next){
+	
+	Post.SinglePost(req.id, (err, results)=>{
+		if(err){
+			console.log("Got next()",err);
+			next(err);
 		}else{
-			res.json(results);
+			res.status(200).json(results);
 		}
 	});
 }
@@ -23,11 +28,11 @@ function singlePost(req,res){
 * Rquire boty post name and user id to create new post
 * Check if user exists before insert new post
 */
-function createPost(req,res){
+function createPost(req,res, next){
 	
-	Post.CreatePost(req.body, function(result){
-		if(result.Error){
-			res.status(400).send(result);
+	Post.CreatePost(req.body, function(err, result){
+		if(err){
+			next(err);
 		}else{
 			res.status(201).json(result);
 		}
@@ -35,7 +40,7 @@ function createPost(req,res){
 }
 
 
-function updatePost(req,res){
+function updatePost(req,res, next){
 
 	if(!isEmptyObj(req.body)){
 		
@@ -44,22 +49,29 @@ function updatePost(req,res){
 			req.params.post_id
 		]
 		
-		Post.UpdatePost(values, (result)=>{
+		Post.UpdatePost(values, (err, result)=>{
 			res.json(result);
 		});
 
 	}
 	else{
-		res.json({result:"Nothing has been updated"});
+		next({
+			"message":"Nothing has been updated",
+			"status":400
+		});
 	}
 
 }
 
 
-function deletePost(req,res){
+function deletePost(req,res, next){
 	let id = req.params.postId;
-	Post.DeletePost(id, (results)=>{
-		res.json(result);
+	Post.DeletePost(id, (err, results)=>{
+		if(err){
+			next(err)
+		}else{
+			res.status(200).json(results);
+		}
 	});
 }
 

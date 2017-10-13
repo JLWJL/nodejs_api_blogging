@@ -10,10 +10,10 @@ router.route('/')
 	
 
 router.route('/:postId')
+
 	.get(postController.SinglePost)
 	.put(postController.UpdatePost)
 	.delete(postController.DeletePost);
-
 
 
 
